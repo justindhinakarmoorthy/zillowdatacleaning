@@ -1,0 +1,41 @@
+# zillowdatacleaning
+Zillow Data Cleaning Process in R 
+
+#zillow data Clenaing
+
+#packages required 
+
+library(tidyverse)
+library(zoo)
+library(lubridate)
+##data cleaning Process
+
+##Importing CSV file 
+metro_rent <- read_csv("Metro_ZORI_AllHomesPlusMultifamily_SSA.csv")
+
+##Changing file from wide to long format 
+metro_rent <- gather(data = metro_rent, key= year_month, value = IndexValue, -RegionID, -RegionName, - SizeRank)
+
+
+
+##change  format of year month to date
+metro_rent <- metro_rent %>%
+  mutate(date = zoo::as.yearmon(metro_rent$year_month))
+
+
+#separating month and date
+metro_rent$year = year(metro_rent$date)
+metro_rent$month = month(metro_rent$date)
+metro_rent$month = month.abb(metro_rent$month)
+
+
+#removing unwanted columns
+metro_rent = subset(metro_rent, select= -c(year_month,date))
+
+#changing month (num) to abbrevation
+
+metro_rent$month = month.abb[metro_rent$month]
+
+##exporting cleaned file for vizualisation
+
+write.csv(metro_rent, "C:\\Users\\vjhut\\Desktop\\zillow research\\metro_rent.csv")
